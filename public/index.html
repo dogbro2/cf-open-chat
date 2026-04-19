@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>OpenRouter Chat Demo</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div id="app">
+    <h1>💬 OpenRouter Chat</h1>
+    <div id="chat-log" class="chat-log"></div>
+
+    <form id="chat-form" class="chat-form">
+      <textarea id="user-input" placeholder="Type a message…" rows="3"></textarea>
+
+      <!-- Model selector -->
+      <label for="model-select" style="margin-right:0.5rem;">Model:</label>
+      <select id="model-select" style="min-width:150px;">
+        <!-- Free‑model alias (default) -->
+        <option value="openrouter/free" selected>openrouter/free (best free)</option>
+
+        <!-- Example free models you can also pick explicitly -->
+        <option value="nvidia/nemotron-3-nano-30b-a3b:free">NVIDIA: Nemotron 3 Nano 30B A3B free</option>
+        <option value="minimax/minimax-m2.5:free">MiniMax: MiniMax M2.5 free</option>
+        <option value="qwen/qwen3-coder:free">Qwen3 Coder 480B A35B free</option>
+        <option value="openai/gpt-oss-120b:free">OpenAI: gpt-oss-120b free</option>
+        <option value="openai/gpt-oss-20b:free">OpenAI: gpt-oss-20b free</option>
+        <option value="google/gemma-4-26b-a4b-it:free">Google: Gemma 4 26B A4B free</option>
+        <option value="z-ai/glm-4.5-air:free">Z.ai: GLM 4.5 Air free</option>
+
+        <!-- Uncomment the lines below if you have credits for paid models -->
+        <!-- <option value="anthropic/claude-3-haiku">Claude 3 Haiku</option> -->
+        <!-- <option value="openai/gpt-4o-mini">GPT‑4o mini</option> -->
+      </select>
+
+      <button type="submit">Send</button>
+    </form>
+  </div>
+
+  <script type="module" src="/script.js"></script>
+</body>
+</html>
