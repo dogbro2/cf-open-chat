@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Chat</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="chat-container">
+    <header>🤖 AI Chat</header>
+    
+    <div id="chat-messages"></div>
+    
+    <form id="chat-form">
+      <select id="model">
+        <option value="openrouter/free">openrouter/free</option>
+        <option value="mistralai/mistral-7b-instruct">Mistral 7B</option>
+        <option value="huggingfaceh4/zephyr-7b-beta">Zephyr 7B</option>
+      </select>
+      <input type="text" id="user-input" placeholder="Type your message..." autocomplete="off">
+      <button type="submit">Send</button>
+    </form>
+  </div>
+
+  <script src="/script.js"></script>
+</body>
+</html>
