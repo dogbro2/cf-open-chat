@@ -24,17 +24,23 @@ your-repo/
 
 1. Push to GitHub:
  Create a new repository and upload these 4 files:
-
 index.html
 style.css
 script.js
 functions/api/chat.js
+
 2. Connect to Cloudflare Pages
+   
 Go to Cloudflare Dashboard → Workers & Pages → Create application → Connect to Git
+
 Select your repository
+
 Build settings:
+
 Build command: (leave empty)
+
 Output directory: .
+
 Click Save and Deploy
 
 3. Add API Key
