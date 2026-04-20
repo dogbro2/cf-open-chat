@@ -1,84 +1,71 @@
-// ---------------------------------------------------------------
-// functions/api/chat.js
-// Proxy for OpenRouter chat completions.
-// Keeps OPENROUTER_API_KEY secret (set in Pages → Settings → Environment Variables)
-// ---------------------------------------------------------------
-export const onRequestPost = async (context) => {
-  // 1️⃣ Read the incoming JSON body from the UI
-  let payload;
+export async function onRequest(context) {
+  const { request } = context;
+
+  // Handle OPTIONS (preflight)
+  if (request.method === 'OPTIONS') {
+    return new Response(null, { status: 200 });
+  }
+
+  // Only allow POST
+  if (request.method !== 'POST') {
+    return new Response('Method not allowed', { status: 405 });
+  }
+
+  // Get API key from environment variables
+  const apiKey = context.env.OPENROUTER_API_KEY;
+  if (!apiKey) {
+    return new Response(JSON.stringify({ error: 'Server error: missing API key' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  // Parse request body
+  let body;
   try {
-    payload = await context.request.json();
-  } catch (e) {
+    body = await request.json();
+  } catch {
     return new Response(JSON.stringify({ error: 'Invalid JSON' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
     });
   }
 
-  // Basic validation – you can expand this as needed
-  if (!payload.messages || !Array.isArray(payload.messages) || payload.messages.length === 0) {
-    return new Response(JSON.stringify({ error: '`messages` array is required' }), {
+  const { model = 'openrouter/free', messages } = body;
+
+  if (!messages || !Array.isArray(messages)) {
+    return new Response(JSON.stringify({ error: 'Missing messages' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
     });
   }
 
-  // 2️⃣ Pull the secret key from the environment
-  const apiKey = context.env.OPENROUTER_API_KEY;
-  if (!apiKey) {
-    return new Response(JSON.stringify({ error: 'Server mis‑configuration: missing API key' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
-
-  // 3️⃣ Build the request to OpenRouter
-  const openRouterUrl = 'https://openrouter.ai/api/v1/chat/completions';
-  const openRouterPayload = {
-    // You can hard‑code a model or let the client send it.
-    // Example: "openrouter/free" lets OpenRouter pick the best free model.
-    model: payload.model || 'openrouter/free',
-    messages: payload.messages,
-    // Forward optional sampling params if the client sent them
-    temperature: payload.temperature ?? 0.7,
-    max_tokens: payload.max_tokens ?? 512,
-    stream: false   // we keep it simple; set true if you want streaming
-  };
-
-  // 4️⃣ Call OpenRouter
-  let openRouterResp;
+  // Call OpenRouter
   try {
-    openRouterResp = await fetch(openRouterUrl, {
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
-        // Optional: help OpenRouter rank models
-        'HTTP-Referer': context.request.headers.get('Referer') || 'https://example.com',
-        'X-Title': 'Cloudflare Pages OpenRouter Demo'
+        'HTTP-Referer': 'https://openaichat.pages.dev',
+        'X-Title': 'AI Chat'
       },
-      body: JSON.stringify(openRouterPayload)
+      body: JSON.stringify({
+        model,
+        messages
+      })
     });
-  } catch (e) {
-    return new Response(JSON.stringify({ error: 'Failed to reach OpenRouter', details: e.message }), {
+
+    const data = await response.json();
+    
+    return new Response(JSON.stringify(data), {
+      status: response.status,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), {
       status: 502,
       headers: { 'Content-Type': 'application/json' }
     });
   }
-
-  // 5️⃣ If OpenRouter returned an error, forward it
-  if (!openRouterResp.ok) {
-    const errBody = await openRouterResp.text();
-    return new Response(errBody, {
-      status: openRouterResp.status,
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
-
-  // 6️⃣ Otherwise, pipe the JSON straight back to the browser
-  const data = await openRouterResp.json();
-  return new Response(JSON.stringify(data), {
-    status: 200,
-    headers: { 'Content-Type': 'application/json' }
-  });
-};
+}
