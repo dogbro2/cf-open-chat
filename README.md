@@ -22,12 +22,7 @@ your-repo/
 
 ## Deployment Steps
 
-1. Push to GitHub:
- Create a new repository and upload these 4 files:
-index.html
-style.css
-script.js
-functions/api/chat.js
+1. Fork this repository
 
 2. Connect to Cloudflare Pages
    
@@ -48,7 +43,7 @@ In your Pages project → Settings → Environment Variables
 Add variable:
 Name: OPENROUTER_API_KEY
 Value: your OpenRouter API key (get it from https://openrouter.ai/keys)
-Save
+Save and redeploy.
 
 4. Test
    
